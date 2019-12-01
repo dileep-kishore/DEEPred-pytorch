@@ -103,3 +103,6 @@ ENV/
 
 # ignore vim tags
 tags
+
+# ignore data
+data/
