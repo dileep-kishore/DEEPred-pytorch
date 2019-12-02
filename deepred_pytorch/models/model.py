@@ -59,5 +59,6 @@ class Model(nn.Module):
             a_2 = F.relu(z_2)
         a_2 = self._dropout(a_2)
         z_3 = self._l3(a_2)
-        a_3 = torch.sigmoid(z_3)
+        # a_3 = torch.sigmoid(z_3)
+        a_3 = F.softmax(z_3, dim=1)
         return a_3
