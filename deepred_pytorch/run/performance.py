@@ -43,8 +43,8 @@ def balanced_accuracy(y_true: torch.Tensor, y_pred: torch.Tensor) -> float:
         -------
         float
     """
-    y_true_np = y_true.numpy()
-    y_pred_np = y_pred.numpy()
+    y_true_np = y_true.detach().numpy()
+    y_pred_np = y_pred.detach().numpy()
     y_true_class = onehot_to_class(y_true_np)
     y_pred_class = onehot_to_class(y_pred_np)
     return metrics.balanced_accuracy_score(y_true_class, y_pred_class)
