@@ -102,5 +102,5 @@ def parse_data(
     prots_to_drop = prot_labels.index[prot_labels.sum(axis=1) == 0]
     feature_vectors.drop(prots_to_drop, inplace=True)
     prot_labels.drop(prots_to_drop, inplace=True)
-    warn(f"Dropping proteins {prots_to_drop}")
+    print(f"Number of samples in dataset: {feature_vectors.shape[0]}")
     return feature_vectors, prot_labels
