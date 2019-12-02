@@ -38,7 +38,7 @@ def normalize_data(data: torch.Tensor, scaler: Any = None) -> Tuple[torch.Tensor
     if not scaler:
         scaler = StandardScaler()
         scaler.fit(data)
-    data_normalized = scaler.tranform(data)
+    data_normalized = torch.Tensor(scaler.transform(data))
     return data_normalized, scaler
 
 
