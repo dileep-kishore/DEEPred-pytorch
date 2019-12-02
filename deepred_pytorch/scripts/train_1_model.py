@@ -21,6 +21,7 @@ def main(
     go_prot_map_test_dir,
     model_save_folder,
 ):
+    torch.set_num_threads(4)
     x_train, y_train = parse_data(
         feature_vector_file, model_go_map_file, go_prot_map_train_dir
     )
