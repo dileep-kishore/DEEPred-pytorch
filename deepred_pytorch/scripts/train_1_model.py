@@ -42,6 +42,7 @@ def main(
         minibatch_size=50,
         batchnorm=True,
         p_dropout=0.5,
+        learning_rate=0.005,
     )
     x_test, y_test = parse_data(
         feature_vector_file, model_go_map_file, go_prot_map_test_dir

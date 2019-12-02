@@ -19,6 +19,7 @@ def train(
     minibatch_size: int = 32,
     batchnorm: bool = True,
     p_dropout: float = 0.5,
+    learning_rate: float = 0.005,
 ) -> nn.Module:
     """
         Train the DEEPred pytroch classifier
@@ -42,6 +43,9 @@ def train(
         p_dropout : float, optional
             The probability of the dropout
             Default value is 0.5
+        learning_rate : float, optional
+            The learning rate for the neural network
+            Default value is 0.005
 
         Returns
         -------
@@ -52,7 +56,7 @@ def train(
     model = Model(parameters, batchnorm=batchnorm, p_dropout=p_dropout)
     # TODO: Need to change the loss function(?)
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=0.01)
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     model.train()
     for epoch in range(epochs):
         loss_per_epoch = 0.0
