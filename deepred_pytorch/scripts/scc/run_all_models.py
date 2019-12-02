@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import pathlib
-import subprocess
+from subprocess import Popen, PIPE
 
 
 def main(model_data, model_output_dir):
@@ -9,9 +9,18 @@ def main(model_data, model_output_dir):
         mname = model_file.stem
         output_file = str(model_output_dir / (mname + "_output.txt"))
         error_file = str(model_output_dir / (mname + "_error.txt"))
-        args = ["qsub", "-o", output_file, "-e", error_file, "run_models.sh", str(model_file)]
-        print(" ".join(args))
-        # subprocess.Popen(args)
+        args = [
+            "qsub",
+            "-o",
+            output_file,
+            "-e",
+            error_file,
+            "run_models.sh",
+            str(model_file),
+        ]
+        print("Launching: ", " ".join(args))
+        stdout, _ = Popen(args, stdout=PIPE, stderr=PIPE)
+        print(stdout)
 
 
 if __name__ == "__main__":
