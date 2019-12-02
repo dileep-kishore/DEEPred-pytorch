@@ -63,7 +63,7 @@ def train(
             # y_mb should be of size (n_samples, 1) and should contain class index
             loss = criterion(y_pred, y_mb.argmax(dim=1))
             loss.backward()
-            optimizer.step()
             loss_per_epoch += loss.item()
+            optimizer.step()
         print(f"Epoch {epoch}: train loss: {loss_per_epoch}")
     return model
