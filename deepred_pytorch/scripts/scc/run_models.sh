@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #$ -P visant
-#$ -pe omp 4
+#$ -pe omp 8
 
 source activate deepred_pytorch
 
