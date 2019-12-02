@@ -22,7 +22,7 @@ class Model(nn.Module):
             Default value is true
         p_dropout : float, optional
             The probability of the dropout
-            Default value is 0.6
+            Default value is 0.5
     """
 
     def __init__(
