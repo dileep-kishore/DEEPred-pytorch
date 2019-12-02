@@ -14,7 +14,11 @@ from deepred_pytorch.run.performance import balanced_accuracy
 
 
 def main(
-    feature_vector_file, model_go_map_file, go_prot_map_train_dir, go_prot_map_test_dir
+    feature_vector_file,
+    model_go_map_file,
+    go_prot_map_train_dir,
+    go_prot_map_test_dir,
+    model_save_folder,
 ):
     x_train, y_train = parse_data(
         feature_vector_file, model_go_map_file, go_prot_map_train_dir
@@ -33,7 +37,7 @@ def main(
         y_train_tensor,
         epochs=1000,
         parameters=parameters,
-        minibatch_size=32,
+        minibatch_size=50,
         batchnorm=True,
         p_dropout=0.5,
     )
@@ -46,6 +50,8 @@ def main(
     y_test_pred_tensor = model(x_test_tensor)
     acc = balanced_accuracy(y_test_tensor, y_test_pred_tensor)
     print(f"Accuracy = {acc}")
+    model_path = str(model_save_folder / model_go_map_file.stem)
+    torch.save(model, model_path)
 
 
 if __name__ == "__main__":
@@ -53,9 +59,11 @@ if __name__ == "__main__":
     MODEL_GO_MAP_FILE = pathlib.Path("data/model_go_map/MFGOTerms30_1_1001_2000_1.txt")
     GO_PROT_MAP_TRAIN_DIR = pathlib.Path("data/go_prot_map/training")
     GO_PROT_MAP_TEST_DIR = pathlib.Path("data/go_prot_map/testing")
+    MODEL_SAVE_FOLDER = pathlib.Path("data/models/")
     main(
         FEATURE_VECTOR_FILE,
         MODEL_GO_MAP_FILE,
         GO_PROT_MAP_TRAIN_DIR,
         GO_PROT_MAP_TEST_DIR,
+        MODEL_SAVE_FOLDER,
     )
