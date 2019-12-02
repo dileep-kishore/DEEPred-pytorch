@@ -19,7 +19,8 @@ def main(model_data, model_output_dir):
             str(model_file),
         ]
         print("Launching: ", " ".join(args))
-        stdout, _ = Popen(args, stdout=PIPE, stderr=PIPE)
+        process = Popen(args, stdout=PIPE, stderr=PIPE)
+        stdout, _ = process.communicate()
         print(stdout)
 
 
