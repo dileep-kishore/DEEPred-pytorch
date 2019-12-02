@@ -80,7 +80,6 @@ def parse_data(
     """
     feature_vectors = pd.read_csv(feature_vector_file, index_col=0)
     go_terms = parse_model_go_map(model_go_map_file)
-    # NOTE: We are assuming there is only one GO term associated with a prot id
     prot_go_map: Dict[str, Set[str]] = defaultdict(set)
     n_labels = len(go_terms)
     label_shape = (feature_vectors.shape[0], n_labels)
@@ -100,7 +99,6 @@ def parse_data(
                                 "There is more than one GO term assocated with a protein id"
                             )
                 break
-    print(prot_ids)
     prots_to_drop = prot_labels.index[prot_labels.sum(axis=1) == 0]
     feature_vectors.drop(prots_to_drop, inplace=True)
     prot_labels.drop(prots_to_drop, inplace=True)
