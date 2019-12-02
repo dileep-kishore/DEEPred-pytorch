@@ -4,6 +4,7 @@
 """
 
 import pathlib
+import sys
 
 import torch
 
@@ -56,7 +57,8 @@ def main(
 
 if __name__ == "__main__":
     FEATURE_VECTOR_FILE = pathlib.Path("data/feature_vectors/CTriad_training_MF.csv")
-    MODEL_GO_MAP_FILE = pathlib.Path("data/model_go_map/MFGOTerms30_1_1001_2000_1.txt")
+    # MODEL_GO_MAP_FILE = pathlib.Path("data/model_go_map/MFGOTerms30_1_1001_2000_1.txt")
+    MODEL_GO_MAP_FILE = pathlib.Path(sys.argv[1])
     GO_PROT_MAP_TRAIN_DIR = pathlib.Path("data/go_prot_map/training")
     GO_PROT_MAP_TEST_DIR = pathlib.Path("data/go_prot_map/testing")
     MODEL_SAVE_FOLDER = pathlib.Path("data/models/")
