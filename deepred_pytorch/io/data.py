@@ -27,7 +27,7 @@ def parse_model_go_map(model_go_map_file: pathlib.Path) -> List[str]:
         List[str]
             The list of GO terms associated with the model
     """
-    model_go_map = pd.read_table(model_go_map_file, header=False, index_col=0, sep=",")
+    model_go_map = pd.read_table(model_go_map_file, header=None, index_col=0)
     return list(model_go_map.index)
 
 
@@ -48,7 +48,7 @@ def parse_go_prot_map(go_prot_map_file: pathlib.Path) -> List[str]:
             The list of protein ids associated with the GO term
     """
     with open(go_prot_map_file) as fid:
-        go_prot_map = fid.readlines()
+        go_prot_map = fid.read().split("\n")
     return go_prot_map
 
 
@@ -78,7 +78,7 @@ def parse_data(
             feature_vectors dataframe with each row containing a feature vector for a prot
             prot_labels dataframe with each row containg labels for a prot
     """
-    feature_vectors = pd.read_csv(feature_vector_file, header=True, index_col=0)
+    feature_vectors = pd.read_csv(feature_vector_file, index_col=0)
     go_terms = parse_model_go_map(model_go_map_file)
     # NOTE: We are assuming there is only one GO term associated with a prot id
     prot_go_map: Dict[str, Set[str]] = defaultdict(set)
@@ -100,6 +100,7 @@ def parse_data(
                                 "There is more than one GO term assocated with a protein id"
                             )
                 break
+    print(prot_ids)
     prots_to_drop = prot_labels.index[prot_labels.sum(axis=1) == 0]
     feature_vectors.drop(prots_to_drop, inplace=True)
     prot_labels.drop(prots_to_drop, inplace=True)
