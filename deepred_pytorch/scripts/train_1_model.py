@@ -44,13 +44,14 @@ def main(
         p_dropout=0.5,
         learning_rate=0.005,
     )
+    model.eval()
     x_test, y_test = parse_data(
         feature_vector_file, model_go_map_file, go_prot_map_test_dir
     )
     x_test_tensor = torch.FloatTensor(x_test.values)
     y_test_tensor = torch.LongTensor(y_test.values)
     x_test_tensor, _ = normalize_data(x_test_tensor, scaler=scaler)
-    y_test_pred_tensor = model(x_test_tensor)
+    y_test_pred_tensor = model.predict(x_test_tensor)
     acc = balanced_accuracy(y_test_tensor, y_test_pred_tensor)
     print(f"Accuracy = {acc}")
     model_path = str(model_save_folder / (model_go_map_file.stem + ".pkl"))

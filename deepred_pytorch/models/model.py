@@ -60,5 +60,12 @@ class Model(nn.Module):
         a_2 = self._dropout(a_2)
         z_3 = self._l3(a_2)
         # a_3 = torch.sigmoid(z_3)
-        a_3 = F.softmax(z_3, dim=1)
+        # a_3 = F.softmax(z_3, dim=1)
+        # NOTE: If using CrossEntropyLoss do not add non-linearity
+        a_3 = z_3
         return a_3
+
+    def predict(self, x):
+        """ Run forward propagation and obtain class probabilities """
+        z_1 = self.forward(x)
+        return F.softmax(z_1, dim=1)
