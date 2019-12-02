@@ -60,8 +60,8 @@ def train(
         for batch_ind, x_mb, y_mb in split_batch(x_shuff, y_shuff, minibatch_size):
             optimizer.zero_grad()
             y_pred = model(x_mb)
-            # Need to fix the dimensions?
-            loss = criterion(y_pred, y_mb)
+            # y_mb should be of size (n_samples, 1) and should contain class index
+            loss = criterion(y_pred, y_mb.argmax(dim=1))
             loss.backward()
             optimizer.step()
             loss_per_epoch += loss.item()
