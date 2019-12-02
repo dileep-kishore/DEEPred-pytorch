@@ -3,11 +3,12 @@
 """
 
 import torch
+from torch.utils.data import RandomSampler
 import torch.nn as nn
 import torch.optim as optim
 
 from ..models import Model
-from ..io.utils import split_batch
+from ..io.utils import split_batch, shuffle_data
 
 
 def train(
@@ -55,7 +56,8 @@ def train(
     model.train()
     for epoch in range(epochs):
         loss_per_epoch = 0.0
-        for batch_ind, x_mb, y_mb in split_batch(x_train, y_train, minibatch_size):
+        x_shuff, y_shuff = shuffle_data(x_train, y_train)
+        for batch_ind, x_mb, y_mb in split_batch(x_shuff, y_shuff, minibatch_size):
             optimizer.zero_grad()
             y_pred = model(x_mb)
             # Need to fix the dimensions?

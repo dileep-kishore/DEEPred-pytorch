@@ -70,3 +70,27 @@ def split_batch(
         x_split = x[ind : ind + minibatch_size, :]
         y_split = y[ind : ind + minibatch_size, :]
         yield batch_ind, x_split, y_split
+
+
+def shuffle_data(x: torch.Tensor, y: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+    """
+        Shuffle the order of the samples in the dataset
+
+        Parameters
+        ----------
+        x : torch.Tensor
+            Feature tensor for the entire batch
+        y : torch.Tensor
+            Label tensor for the entire batch
+
+        Returns
+        -------
+        Tuple[torch.Tensor, torch.Tensor]
+            The shuffled dataset
+    """
+    assert x.shape[0] == y.shape[0], "x and y shapes do not match"
+    inds = list(range(x.shape[0]))
+    np.random.shuffle(inds)
+    x_shuffled = x[inds, :]
+    y_shuffled = y[inds, :]
+    return x_shuffled, y_shuffled
