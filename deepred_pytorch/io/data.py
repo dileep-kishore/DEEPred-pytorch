@@ -52,13 +52,13 @@ def parse_go_prot_map(go_prot_map_file: pathlib.Path) -> List[str]:
     return go_prot_map
 
 
-def create_training_data(
+def parse_data(
     feature_vector_file: pathlib.Path,
     model_go_map_file: pathlib.Path,
     go_prot_map_dir: pathlib.Path,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
-        Create training data for DEEPred
+        Parse training data for DEEPred
 
         Parameters
         ----------
