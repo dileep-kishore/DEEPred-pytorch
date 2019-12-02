@@ -50,7 +50,7 @@ def main(
     y_test_pred_tensor = model(x_test_tensor)
     acc = balanced_accuracy(y_test_tensor, y_test_pred_tensor)
     print(f"Accuracy = {acc}")
-    model_path = str(model_save_folder / model_go_map_file.stem)
+    model_path = str(model_save_folder / (model_go_map_file.stem + ".pkl"))
     torch.save(model, model_path)
 
 
