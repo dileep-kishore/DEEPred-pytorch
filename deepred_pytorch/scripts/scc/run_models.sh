@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 #$ -P visant
 #$ -pe omp 4
-#$ -o data/model_outputs/$1
-#$ -e data/models_outputs/
 
 source activate deepred_pytorch
 
