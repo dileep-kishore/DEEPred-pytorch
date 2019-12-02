@@ -13,14 +13,14 @@ import torch
 Batch = Tuple[int, torch.Tensor, torch.Tensor]
 
 
-def normalize_data(data: np.array, scaler: Any = None) -> Tuple[np.array, Any]:
+def normalize_data(data: torch.Tensor, scaler: Any = None) -> Tuple[torch.Tensor, Any]:
     """
         Normalize data using the provided scaler object
         Uses `StandardScaler` from scikit-learn if scaler not provided
 
         Parameters
         ----------
-        data : np.array
+        data : torch.Tensor
             The data to be normalized
             Each sample must be in one row
             Features must be along the columns
