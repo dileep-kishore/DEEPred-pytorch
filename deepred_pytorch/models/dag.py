@@ -194,7 +194,10 @@ class ModelDAG:
                 prediction = model.predict(feature_vector).detach().numpy()
                 prediction[prediction > threshold] = 1
                 prediction[prediction < threshold] = 0
-                selected_inds = np.argwhere(prediction == 1)[0]
+                try:
+                    selected_inds = np.argwhere(prediction == 1)[0]
+                except IndexError:
+                    selected_inds = []
                 selected_go_terms.update([labels[i] for i in selected_inds])
             next_models: Set[str] = set()
             for go_term in selected_go_terms:
