@@ -36,7 +36,7 @@ def main(
         "n_y": y_train.shape[1],
     }
     x_train_tensor = torch.FloatTensor(x_train.values)
-    y_train_tensor = torch.LongTensor(y_train.values)
+    y_train_tensor = torch.FloatTensor(y_train.values)
     x_train_tensor, scaler = normalize_data(x_train_tensor)
     model = train(
         x_train_tensor,
@@ -53,7 +53,7 @@ def main(
         feature_vector_file, model_go_map_file, go_prot_map_test_dir
     )
     x_test_tensor = torch.FloatTensor(x_test.values)
-    y_test_tensor = torch.LongTensor(y_test.values)
+    y_test_tensor = torch.FloatTensor(y_test.values)
     x_test_tensor, _ = normalize_data(x_test_tensor, scaler=scaler)
     y_test_pred_tensor = model.predict(x_test_tensor)
     prec = average_precision(y_test_tensor, y_test_pred_tensor)
