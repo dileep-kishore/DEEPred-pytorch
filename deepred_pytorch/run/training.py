@@ -62,6 +62,8 @@ def train(
         loss_per_epoch = 0.0
         x_shuff, y_shuff = shuffle_data(x_train, y_train)
         for batch_ind, x_mb, y_mb in split_batch(x_shuff, y_shuff, minibatch_size):
+            if x_mb.shape[0] < 5:
+                continue
             optimizer.zero_grad()
             y_pred = model(x_mb)
             # y_mb should be of size (n_samples, 1) and should contain class index
