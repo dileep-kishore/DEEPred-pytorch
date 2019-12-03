@@ -150,3 +150,33 @@ def parse_prot_go_map(go_prot_map_dir: pathlib.Path) -> Dict[str, Set[str]]:
         for protein in prot_list:
             prot_go_map[protein].add(go_term)
     return prot_go_map
+
+
+def parse_model_output(model_output_file: pathlib.Path) -> Dict[str, float]:
+    """
+        Parse the model output file and return a dictionary of accuracies
+
+        Parameters
+        ----------
+        model_output_file : pathlib.Path
+            The model output file
+            The last line contains the accuracy information
+
+        Returns
+        -------
+        Dict[str, float]
+            Dictionary of accurracy and corresponding value
+            keys in avg_precision, lrap, roc_auc
+    """
+    accuracy_dict: Dict[str, float] = {
+        "avg_precision": 0,
+        "lrap": 0,
+        "roc_auc": 0,
+    }
+    with open(model_output_file) as fid:
+        data = fid.readlines()[-1]
+    accuracies = [float(d.split(" = ")[-1]) for d in data.split(",")]
+    accuracy_dict["avg_precision"] = accuracies[0]
+    accuracy_dict["lrap"] = accuracies[1]
+    accuracy_dict["roc_auc"] = accuracies[2]
+    return accuracy_dict
