@@ -13,21 +13,18 @@ import seaborn as sns
 from ..io.data import parse_model_output
 
 
-def perf_vs_modelsize(
-    model_output_dir: pathlib.Path, fig_path: pathlib.Path
-) -> pd.DataFrame:
+def create_perf_dataframe(model_output_dir: pathlib.Path) -> pd.DataFrame:
     """
-        Visualization model performance vs. model size
+        Create a pandas dataframe that tabulates model performance and statistics
 
         Parameters
         ----------
         model_output_dir : pathlib.Path
-        fig_path : pathlib.Path
+            The directory containing the model run output
 
         Returns
         -------
         pd.DataFrame
-            DataFrame containing model performance
     """
     pattern = re.compile(r"MFGOTerms30_(.)_(.*)_(.*)_(.*)_output")
     data_list: List[dict] = []
@@ -39,8 +36,37 @@ def perf_vs_modelsize(
         else:
             raise ValueError("Model format is incorrect")
         accuracy_dict = parse_model_output(model_output_file)
-        data_list.append({**accuracy_dict, "model_size": f"{size_lb}-{size_ub}"})
+        data_list.append(
+            {
+                **accuracy_dict,
+                "model_size": f"{size_lb}-{size_ub}",
+                "level": int(level),
+                "model_num": int(model_num),
+            }
+        )
     data_df = pd.DataFrame(data_list)
+    return data_df
+
+
+def perf_vs_modelsize(
+    model_output_dir: pathlib.Path, fig_path: pathlib.Path
+) -> pd.DataFrame:
+    """
+        Visualization model performance vs. model size
+
+        Parameters
+        ----------
+        model_output_dir : pathlib.Path
+            The directory containing the model run output
+        fig_path : pathlib.Path
+            The path to save the figure
+
+        Returns
+        -------
+        pd.DataFrame
+            DataFrame containing model performance
+    """
+    data_df = create_perf_dataframe(model_output_dir)
     x_order = sorted(set(data_df["model_size"]), key=lambda x: int(x.split("-")[0]))
     sns.boxplot(x="model_size", y="roc_auc", data=data_df, order=x_order)
     sns.swarmplot(x="model_size", y="roc_auc", data=data_df, color=".25", order=x_order)
