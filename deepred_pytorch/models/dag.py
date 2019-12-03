@@ -4,7 +4,7 @@
 
 from collections import defaultdict
 import pathlib
-from typing import Dict, List, Set
+from typing import Dict, Iterable, List, Set, Tuple
 
 import networkx as nx
 import torch
@@ -124,6 +124,17 @@ class ModelDAG:
                 self.dag.remove_edge(u, v)
         cycles = list(nx.cycles.simple_cycles(self.dag))
         assert len(cycles) == 0, "There are still cycles present"
+
+    @property
+    def models_by_level(self) -> Iterable[Tuple[int, Set[str]]]:
+        """ Returns an iterable containing the models at each level """
+        level_model_dict: Dict[int, Set[str]] = defaultdict(set)
+        for node, node_data in self.dag.nodes(data=True):
+            if node_data["bipartite"] == 0:
+                level = int(node.split("_")[1])
+                level_model_dict[level].add(node)
+        for level in range(1, len(level_model_dict) + 1):
+            yield level, level_model_dict[level]
 
     def load_models(self, model_dir: pathlib.Path) -> None:
         """
