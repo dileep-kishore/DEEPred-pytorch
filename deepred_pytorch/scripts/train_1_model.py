@@ -52,6 +52,7 @@ def main(
     x_test, y_test = parse_data(
         feature_vector_file, model_go_map_file, go_prot_map_test_dir
     )
+    assert (y_train.columns == y_test.columns).all()
     x_test_tensor = torch.FloatTensor(x_test.values)
     y_test_tensor = torch.FloatTensor(y_test.values)
     x_test_tensor, _ = normalize_data(x_test_tensor, scaler=scaler)
