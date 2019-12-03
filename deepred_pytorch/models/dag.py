@@ -70,12 +70,15 @@ class ModelDAG:
         dag = nx.DiGraph()
         model_go_dict: Dict[str, List[str]] = {}
         go_model_dict: Dict[str, Set[str]] = defaultdict(set)
+        level_model_dict: Dict[int, Set[str]] = defaultdict(set)
         for model_go_map_file in model_go_map_dir.iterdir():
             go_terms = parse_model_go_map(model_go_map_file)
             model_name = model_go_map_file.stem
             if model_name in model_go_dict:
                 raise ValueError("Duplicate models in model_go_map_dir")
             model_go_dict[model_name] = go_terms
+            level = int(model_name.split("_")[1])
+            level_model_dict[level].add(model_name)
             for go_term in go_terms:
                 for go_parent in self.go_dag.predecessors(go_term):
                     go_model_dict[go_parent].add(model_name)
@@ -83,13 +86,21 @@ class ModelDAG:
         dag.add_nodes_from(list(model_go_dict.keys()), bipartite=0, model=None)
         dag.add_nodes_from(self.go_dag.nodes, bipartite=1)
         # Add edges to the dag
-        for model_name in model_go_dict:
-            dag.nodes[model_name]["label_vector"] = model_go_dict[model_name]
-            for go_term in model_go_dict[model_name]:
-                dag.add_edge(model_name, go_term)
-        for go_term in go_model_dict:
-            for model_name in go_model_dict[go_term]:
-                dag.add_edge(go_term, model_name)
+        for level in range(1, len(level_model_dict) + 1):
+            model_names = level_model_dict[level]
+            go_terms_level: Set[str] = set()
+            for model_name in model_names:
+                go_terms = model_go_dict[model_name]
+                go_terms_level.update(go_terms)
+                dag.nodes[model_name]["label_vector"] = go_terms
+                for go_term in go_terms:
+                    dag.add_edge(model_name, go_term)
+            next_level = level + 1
+            if next_level in level_model_dict:
+                for go_term in go_terms_level:
+                    for model_name in go_model_dict[go_term]:
+                        if model_name in level_model_dict[next_level]:
+                            dag.add_edge(go_term, model_name)
         return dag
 
     def _remove_cycles(self) -> None:
