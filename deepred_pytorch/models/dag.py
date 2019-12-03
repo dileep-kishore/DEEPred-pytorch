@@ -159,3 +159,49 @@ class ModelDAG:
                 model_name = model_file.stem
                 model = torch.load(str(model_file))
                 self.dag.nodes[model_name]["model"] = model
+
+    def predict(self, feature_vector: torch.Tensor, threshold: float = 0.5) -> Set[str]:
+        """
+            Predict the GO terms associated with the feature vector
+
+            Parameters
+            ----------
+            feature_vector : torch.Tensor
+                A feature vector that represents one protein sequence
+                Size: (D) where D - dimensions of the feature vector
+            threshold : float, optional
+                The threshold to be applied on the predicted probabilities
+
+            Returns
+            -------
+            Set[str]
+                The set of GO terms predicted
+        """
+        # Error handling
+        for model_name in self.model_nodes:
+            if self.dag.nodes[model_name]["model"] is None:
+                raise ValueError("Please load all models before running predict")
+        level_model_dict = dict(self.models_by_level)
+        level = 1
+        model_names = level_model_dict[level]
+        all_go_terms: Set[str] = set()
+        while len(model_names) > 0:
+            selected_go_terms: Set[str] = set()
+            for model_name in model_names:
+                model = self.dag.nodes[model_name]["model"]
+                model.eval()
+                labels = self.dag.nodes[model_name]["label_vector"]
+                prediction = model.predict(feature_vector).detach().numpy()
+                prediction[prediction > threshold] = 1
+                prediction[prediction < threshold] = 0
+                selected_inds = np.argwhere(prediction == 1)[0]
+                selected_go_terms.update([labels[i] for i in selected_inds])
+            next_models: Set[str] = set()
+            for go_term in selected_go_terms:
+                for model_name in nx.descendants(self.dag, go_term):
+                    if model_name in level_model_dict[level + 1]:
+                        next_models.add(model_name)
+            all_go_terms.update(selected_go_terms)
+            level = level + 1
+            model_names = next_models
+        return all_go_terms
