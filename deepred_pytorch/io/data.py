@@ -50,8 +50,8 @@ def parse_go_prot_map(go_prot_map_file: pathlib.Path) -> List[str]:
             The list of protein ids associated with the GO term
     """
     with open(go_prot_map_file) as fid:
-        go_prot_map = fid.read().split("\n")
-    return go_prot_map
+        prot_list = fid.read().split("\n")
+    return prot_list
 
 
 def parse_data(
