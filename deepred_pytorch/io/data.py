@@ -125,3 +125,28 @@ def parse_go_dag(go_obo_file: pathlib.Path) -> nx.MultiDiGraph:
     go_dag = obonet.read_obo(str(go_obo_file))
     assert nx.is_directed_acyclic_graph(go_dag), "The graph must be a DAG"
     return go_dag
+
+
+def parse_prot_go_map(go_prot_map_dir: pathlib.Path) -> Dict[str, Set[str]]:
+    """
+        Parse all go_prot_map files
+        Returns dictionary mapping proteins to set of GO terms
+
+        Parameters
+        ----------
+        go_prot_map_dir : pathlib.Path
+            Dir containing files with uniprot protein ids for every GO term
+            Each file name must contain the GO term and each line must be a prot id
+
+        Returns
+        -------
+        Dict[str, Set[str]]
+            Mapping from proteins to its associated set of GO terms
+    """
+    prot_go_map: Dict[str, Set[str]] = defaultdict(set)
+    for go_prot_map_file in go_prot_map_dir.iterdir():
+        go_term = go_prot_map_file.stem
+        prot_list = parse_go_prot_map(go_prot_map_file)
+        for protein in prot_list:
+            prot_go_map[protein].add(go_term)
+    return prot_go_map
