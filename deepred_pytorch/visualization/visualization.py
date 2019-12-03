@@ -75,3 +75,31 @@ def perf_vs_modelsize(
     plt.xticks(rotation=30)
     plt.tight_layout()
     plt.savefig(fig_path)
+
+
+def perf_vs_level(
+    model_output_dir: pathlib.Path, fig_path: pathlib.Path
+) -> pd.DataFrame:
+    """
+        Visualization of model performance vs. GO level
+
+        Parameters
+        ----------
+        model_output_dir : pathlib.Path
+            The directory containing the model run output
+        fig_path : pathlib.Path
+            The path to save the figure
+
+        Returns
+        -------
+        pd.DataFrame
+            DataFrame containing model performance
+    """
+    plt.figure()
+    data_df = create_perf_dataframe(model_output_dir)
+    sns.boxplot(x="level", y="roc_auc", data=data_df, palette="Set1")
+    sns.swarmplot(x="level", y="roc_auc", data=data_df, color=".25")
+    plt.xlabel("GO level")
+    plt.ylabel("ROC AUC")
+    plt.tight_layout()
+    plt.savefig(fig_path)
