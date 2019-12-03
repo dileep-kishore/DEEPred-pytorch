@@ -54,8 +54,7 @@ def train(
     """
     # NOTE: Normalize data before passing it into this function
     model = Model(parameters, batchnorm=batchnorm, p_dropout=p_dropout)
-    # TODO: Need to change the loss function(?)
-    criterion = nn.CrossEntropyLoss()
+    criterion = nn.BCEWithLogitsLoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     model.train()
     for epoch in range(epochs):
@@ -66,8 +65,7 @@ def train(
                 continue
             optimizer.zero_grad()
             y_pred = model(x_mb)
-            # y_mb should be of size (n_samples, 1) and should contain class index
-            loss = criterion(y_pred, y_mb.argmax(dim=1))
+            loss = criterion(y_pred, y_mb)
             loss.backward()
             loss_per_epoch += loss.item()
             optimizer.step()
