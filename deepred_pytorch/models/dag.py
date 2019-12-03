@@ -7,6 +7,7 @@ import pathlib
 from typing import Dict, Iterable, List, Set, Tuple
 
 import networkx as nx
+import numpy as np
 import torch
 
 from ..io import parse_go_dag
@@ -124,6 +125,13 @@ class ModelDAG:
                 self.dag.remove_edge(u, v)
         cycles = list(nx.cycles.simple_cycles(self.dag))
         assert len(cycles) == 0, "There are still cycles present"
+
+    @property
+    def model_nodes(self) -> Iterable[str]:
+        """ Returns an iterable containing the model node names """
+        for node, node_data in self.dag.nodes(data=True):
+            if node_data["bipartite"] == 0:
+                yield node
 
     @property
     def models_by_level(self) -> Iterable[Tuple[int, Set[str]]]:
