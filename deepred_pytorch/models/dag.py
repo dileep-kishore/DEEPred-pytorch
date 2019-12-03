@@ -34,7 +34,7 @@ class ModelDAG:
         ----------
         go_dag : nx.MultiDiGraph
             The DAG that represents the GO term hierarchy
-        dag : nx.MultiDiGraph
+        dag : nx.DiGraph
             The DAG that represents the complete DEEPred GO classifier
             Attributes
             ----------
@@ -53,7 +53,7 @@ class ModelDAG:
         self.dag = self._build_dag(model_go_map_dir)
         self._remove_cycles()
 
-    def _build_dag(self, model_go_map_dir: pathlib.Path) -> nx.MultiDiGraph:
+    def _build_dag(self, model_go_map_dir: pathlib.Path) -> nx.DiGraph:
         """
             Build the bipartite DAG for the models and GO terms
 
@@ -64,10 +64,10 @@ class ModelDAG:
 
             Returns
             -------
-            nx.MultiDiGraph
+            nx.DiGraph
                 The model-GO term bipartite DAG
         """
-        dag = nx.MultiDiGraph()
+        dag = nx.DiGraph()
         model_go_dict: Dict[str, List[str]] = {}
         go_model_dict: Dict[str, Set[str]] = defaultdict(set)
         for model_go_map_file in model_go_map_dir.iterdir():
