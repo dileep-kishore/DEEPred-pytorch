@@ -12,6 +12,8 @@ import seaborn as sns
 
 from ..io.data import parse_model_output
 
+sns.set(style="ticks")
+
 
 def create_perf_dataframe(model_output_dir: pathlib.Path) -> pd.DataFrame:
     """
@@ -66,9 +68,12 @@ def perf_vs_modelsize(
         pd.DataFrame
             DataFrame containing model performance
     """
+    plt.figure()
     data_df = create_perf_dataframe(model_output_dir)
     x_order = sorted(set(data_df["model_size"]), key=lambda x: int(x.split("-")[0]))
-    sns.boxplot(x="model_size", y="roc_auc", data=data_df, order=x_order)
+    sns.boxplot(
+        x="model_size", y="roc_auc", data=data_df, order=x_order, palette="Set2",
+    )
     sns.swarmplot(x="model_size", y="roc_auc", data=data_df, color=".25", order=x_order)
     plt.xlabel("Model size")
     plt.ylabel("ROC AUC")
