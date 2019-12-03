@@ -68,4 +68,4 @@ class Model(nn.Module):
     def predict(self, x):
         """ Run forward propagation and obtain class probabilities """
         z_1 = self.forward(x)
-        return F.softmax(z_1, dim=1)
+        return torch.sigmoid(z_1)
