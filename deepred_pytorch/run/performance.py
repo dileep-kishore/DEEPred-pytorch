@@ -77,3 +77,25 @@ def average_precision(
     y_true_np = y_true.detach().numpy()
     y_pred_np = y_pred.detach().numpy()
     return metrics.average_precision_score(y_true_np, y_pred_np, average=average)
+
+
+def label_ranking(y_true: torch.Tensor, y_pred: torch.Tensor) -> float:
+    """
+        Computes the ranking-based average precision for the predictions
+        Supports multi-label multi-class classification
+
+        Parameters
+        ----------
+        y_true : torch.Tensor
+            The true label tensor
+        y_pred : torch.Tensor
+            The predicted label tensor
+
+        Returns
+        -------
+        float
+            The label ranking average precision score
+    """
+    y_true_np = y_true.detach().numpy()
+    y_pred_np = y_pred.detach().numpy()
+    return metrics.label_ranking_average_precision_score(y_true_np, y_pred_np)
