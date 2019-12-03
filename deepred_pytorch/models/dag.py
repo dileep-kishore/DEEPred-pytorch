@@ -51,6 +51,7 @@ class ModelDAG:
     ) -> None:
         self.go_dag = parse_go_dag(go_obo_file)
         self.dag = self._build_dag(model_go_map_dir)
+        self._remove_cycles()
 
     def _build_dag(self, model_go_map_dir: pathlib.Path) -> nx.MultiDiGraph:
         """
@@ -90,6 +91,28 @@ class ModelDAG:
             for model_name in go_model_dict[go_term]:
                 dag.add_edge(go_term, model_name)
         return dag
+
+    def _remove_cycles(self) -> None:
+        """ Remove cycles from the graph """
+        cycles = nx.cycles.simple_cycles(self.dag)
+        for path in cycles:
+            # Remove self loops
+            if len(path) == 2:
+                u, v = path
+                if self.dag.nodes[u]["bipartite"] == 0:
+                    v, u = u, v
+            # Cut bigger circuit
+            else:
+                for i, node in enumerate(path):
+                    if self.dag.nodes[node]["bipartite"] == 1:
+                        go_node_ind = i
+                        break
+                u, v = path[go_node_ind], path[go_node_ind + 1]
+            u_node = self.dag.nodes[u]
+            if u_node["bipartite"] == 1:
+                self.dag.remove_edge(u, v)
+        cycles = list(nx.cycles.simple_cycles(self.dag))
+        assert len(cycles) == 0, "There are still cycles present"
 
     def load_models(self, model_dir: pathlib.Path) -> None:
         """
