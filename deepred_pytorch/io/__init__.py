@@ -1,1 +1,1 @@
-from .data import parse_data
+from .data import parse_data, parse_go_dag

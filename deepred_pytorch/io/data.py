@@ -7,6 +7,8 @@ import pathlib
 from typing import Dict, List, Set, Tuple
 from warnings import warn
 
+import obonet
+import networkx as nx
 import numpy as np
 import pandas as pd
 
@@ -104,3 +106,22 @@ def parse_data(
     prot_labels.drop(prots_to_drop, inplace=True)
     print(f"Number of samples in dataset: {feature_vectors.shape[0]}")
     return feature_vectors, prot_labels
+
+
+def parse_go_dag(go_obo_file: pathlib.Path) -> nx.MultiDiGraph:
+    """
+        Parse the GO obo file into a DAG
+
+        Parameters
+        ----------
+        go_obo_file : pathlib.Path
+            The file containing the GO term hierarchy
+
+        Returns
+        -------
+        nx.MultiGraph
+            The GO DAG as a networkx `MultiDiGraph`
+    """
+    go_dag = obonet.read_obo(str(go_obo_file))
+    assert nx.is_directed_acyclic_graph(go_dag), "The graph must be a DAG"
+    return go_dag
