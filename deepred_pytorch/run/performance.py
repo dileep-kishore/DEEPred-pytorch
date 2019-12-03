@@ -45,6 +45,35 @@ def balanced_accuracy(y_true: torch.Tensor, y_pred: torch.Tensor) -> float:
     """
     y_true_np = y_true.detach().numpy()
     y_pred_np = y_pred.detach().numpy()
+    # NOTE: This will eliminate the multi-label nature of the data
     y_true_class = onehot_to_class(y_true_np)
     y_pred_class = onehot_to_class(y_pred_np)
     return metrics.balanced_accuracy_score(y_true_class, y_pred_class)
+
+
+def average_precision(
+    y_true: torch.Tensor, y_pred: torch.Tensor, average: str = "micro"
+) -> float:
+    """
+        Computes the average precision score for the predictions
+        Supports multi-label multi-class classification
+
+        Parameters
+        ----------
+        y_true : torch.Tensor
+            The true label tensor
+        y_pred : torch.Tensor
+            The predicted label tensor
+        average : str, optional
+            The type of averaging to be performed
+            Look up scikit-learn multi-label classification for details
+            Default value is micro
+
+        Returns
+        -------
+        float
+            The average precision score
+    """
+    y_true_np = y_true.detach().numpy()
+    y_pred_np = y_pred.detach().numpy()
+    return metrics.average_precision_score(y_true_np, y_pred_np, average=average)
