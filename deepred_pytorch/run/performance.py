@@ -99,3 +99,31 @@ def label_ranking(y_true: torch.Tensor, y_pred: torch.Tensor) -> float:
     y_true_np = y_true.detach().numpy()
     y_pred_np = y_pred.detach().numpy()
     return metrics.label_ranking_average_precision_score(y_true_np, y_pred_np)
+
+
+def roc_auc_score(
+    y_true: torch.Tensor, y_pred: torch.Tensor, average: str = "micro"
+) -> float:
+    """
+        Computes the Area Under the Receiver Operating Characteristic Curve
+        Supports multi-label multi-class classification
+
+        Parameters
+        ----------
+        y_true : torch.Tensor
+            The true label tensor
+        y_pred : torch.Tensor
+            The predicted label tensor
+        average : str, optional
+            The type of averaging to be performed
+            Look up scikit-learn multi-label classification for details
+            Default value is micro
+
+        Returns
+        -------
+        float
+            The label ranking average precision score
+    """
+    y_true_np = y_true.detach().numpy()
+    y_pred_np = y_pred.detach().numpy()
+    return metrics.roc_auc_score(y_true_np, y_pred_np, average=average)

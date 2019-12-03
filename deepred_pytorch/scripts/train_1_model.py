@@ -11,7 +11,11 @@ import torch
 from deepred_pytorch.io import parse_data
 from deepred_pytorch.io.utils import normalize_data
 from deepred_pytorch.run import train
-from deepred_pytorch.run.performance import average_precision, label_ranking
+from deepred_pytorch.run.performance import (
+    average_precision,
+    label_ranking,
+    roc_auc_score,
+)
 
 
 def main(
@@ -54,7 +58,10 @@ def main(
     y_test_pred_tensor = model.predict(x_test_tensor)
     prec = average_precision(y_test_tensor, y_test_pred_tensor)
     lrap = label_ranking(y_test_tensor, y_test_pred_tensor)
-    print(f"Average precision = {prec}, Lable ranking precision = {lrap}")
+    auc = roc_auc_score(y_test_tensor, y_test_pred_tensor)
+    print(
+        f"Average precision = {prec}, Label ranking precision = {lrap}, ROC AUC = {auc}"
+    )
     model_path = str(model_save_folder / (model_go_map_file.stem + ".pkl"))
     torch.save(model, model_path)
 
