@@ -3,6 +3,7 @@
 """
 
 from collections import defaultdict
+from itertools import product
 import pathlib
 from typing import Dict, Iterable, List, Set, Tuple
 
@@ -192,6 +193,7 @@ class ModelDAG:
                 model.eval()
                 labels = self.dag.nodes[model_name]["label_vector"]
                 prediction = model.predict(feature_vector).detach().numpy()
+                prediction = prediction.reshape((prediction.shape[1]))
                 prediction[prediction > threshold] = 1
                 prediction[prediction < threshold] = 0
                 try:
@@ -208,3 +210,74 @@ class ModelDAG:
             level = level + 1
             model_names = next_models
         return all_go_terms
+
+    def predict_v2(
+        self, feature_vector: torch.Tensor, threshold: float = 0.5
+    ) -> Set[str]:
+        """
+            Predict the GO terms associated with the feature vector
+
+            feature_vector : torch.Tensor
+                A feature vector that represents one protein sequence
+                Size: (D) where D - dimensions of the feature vector
+            threshold : float, optional
+                The threshold to be applied on the predicted probabilities
+
+            Returns
+            -------
+            Set[str]
+                The set of GO terms predicted
+        """
+        full_go_dag = self.go_dag
+        # Error handling
+        for model_name in self.model_nodes:
+            if self.dag.nodes[model_name]["model"] is None:
+                raise ValueError("Please load all models before running predict")
+        level_model_dict = dict(self.models_by_level)
+        go_prob_dict_list: List[Dict[str, float]] = []
+        for level, model_names in level_model_dict.items():
+            go_prob_dict_list.append(defaultdict(float))
+            for model_name in model_names:
+                model = self.dag.nodes[model_name]["model"]
+                model.eval()
+                labels = self.dag.nodes[model_name]["label_vector"]
+                prediction = model.predict(feature_vector).detach().numpy()
+                prediction = prediction.reshape((prediction.shape[1]))
+                try:
+                    selected_inds = np.argwhere(prediction > threshold)[0]
+                    selected_probs = prediction[selected_inds]
+                except IndexError:
+                    selected_inds = []
+                    selected_probs = []
+                predicted_go_terms = [labels[i] for i in selected_inds]
+                for go_term, prob in zip(predicted_go_terms, selected_probs):
+                    go_prob_dict_list[-1][go_term] += prob
+        go_dag = nx.DiGraph()
+        for ind, go_prob_dict in enumerate(go_prob_dict_list):
+            connect_flag = False
+            level = ind + 1
+            if level > 1:
+                connect_flag = True
+            for go_term, prob in go_prob_dict.items():
+                assert go_term in full_go_dag.nodes
+                go_dag.add_node(go_term, prob=prob)
+            if connect_flag:
+                go_prob_dict_parent = go_prob_dict_list[ind - 1]
+                go_terms_parent = list(go_prob_dict_parent.keys())
+                go_terms_current = list(go_prob_dict.keys())
+                for u, v in product(go_terms_parent, go_terms_current):
+                    if (u, v) in full_go_dag.edges:
+                        go_dag.add_edge(u, v)
+        source_go_terms = list(go_prob_dict_list[0].keys())
+        target_go_terms = list(go_prob_dict_list[-1].keys())
+        path_scores: List[Tuple[list, float]] = []
+        for source, target in product(source_go_terms, target_go_terms):
+            try:
+                path = nx.shortest_path(go_dag, source=source, target=target)
+                score = sum([go_dag.nodes[n]["prob"] for n in path])
+            except:
+                path = []
+                score = 0
+            path_scores.append((path, score))
+        sorted_path_scores = sorted(path_scores, key=lambda x: x[1], reverse=True)
+        return set(sorted_path_scores[0][0])
