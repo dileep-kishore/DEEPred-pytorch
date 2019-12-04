@@ -4,6 +4,7 @@
 
 from collections import defaultdict
 import pathlib
+import re
 from typing import Dict, List, Set, Tuple
 from warnings import warn
 
@@ -180,3 +181,40 @@ def parse_model_output(model_output_file: pathlib.Path) -> Dict[str, float]:
     accuracy_dict["lrap"] = accuracies[1]
     accuracy_dict["roc_auc"] = accuracies[2]
     return accuracy_dict
+
+
+def get_trainingset_stats(model_go_map_dir: pathlib.Path) -> pd.DataFrame:
+    """
+        Create a pandas dataframe that tabulates training set statistics
+
+        Parameters
+        ----------
+        model_go_map_dir : pathlib.Path
+            The directory containing the model details
+
+        Returns
+        -------
+        pd.DataFrame
+            The training set statistics
+    """
+    pattern = re.compile(r"MFGOTerms30_(.)_(.*)_(.*)_(.*)")
+    data_list: List[dict] = []
+    for model_go_map_file in model_go_map_dir.iterdir():
+        model_name = model_go_map_file.stem
+        match = re.match(pattern, model_name)
+        if match:
+            level, size_lb, size_ub, model_num = match.groups()
+        else:
+            raise ValueError("Model format is incorrect")
+        model_go_map = pd.read_table(model_go_map_file, header=None, index_col=0)
+        data_list.append(
+            {
+                "n_go_terms": model_go_map.shape[0],
+                "n_proteins": int(model_go_map.sum()),
+                "model_size": f"{size_lb}-{size_ub}",
+                "level": int(level),
+                "model_num": int(model_num),
+            }
+        )
+    data_df = pd.DataFrame(data_list)
+    return data_df
